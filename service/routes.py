@@ -22,7 +22,7 @@ Product Store Service with UI
 from flask import jsonify, request, abort
 from flask import url_for
 from sympy import product  # noqa: F401 pylint: disable=unused-import
-from service.models import Product
+from service.models import Product, Category
 from service.common import status  # HTTP Status Codes
 from . import app
 
@@ -105,10 +105,19 @@ def list_products():
     """Returns a list of products"""
     app.logger.info("Request to list Products...")
     name = request.args.get("name")
+    category = request.args.get("category")
+    available = request.args.get("available")
     products = []
     if name:
         app.logger.info("Find by name: %s", name)
         products = Product.find_by_name(name)
+    elif category:
+        app.logger.info(f"Find by category: {category}")
+        products = Product.find_by_category(getattr(Category, category.upper()))
+    elif available:
+        app.logger.info(f"Find by availability")
+        available_value = available.lower() in ["true", "yes", "1"]
+        products = Product.find_by_availability(available_value)
     else:
         app.logger.info("Find all")
         # use the Product.all() method to retrieve all products

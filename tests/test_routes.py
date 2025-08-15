@@ -263,7 +263,20 @@ class TestProductRoutes(TestCase):
         data = response.get_json()
         self.assertEqual(len(data), cat_count)
         for product in data:
-            self.assertEqual(product["category"], test_cat)
+            self.assertEqual(product["category"], test_cat.name)
+
+    def test_query_by_availibility(self):
+        """It shoudl query the db by availibility"""
+        products = self._create_products(10)
+        available_products = [product for product in products if product.available is True]
+        response = self.client.get(
+            BASE_URL, query_string=f"available=true"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data=response.get_json()
+        self.assertEqual(len(data), len(available_products))
+        for product in data:
+            self.assertEqual(product["available"], True)
 
     ######################################################################
     # Utility functions

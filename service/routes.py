@@ -18,6 +18,7 @@
 """
 Product Store Service with UI
 """
+
 from flask import jsonify, request, abort
 from flask import url_for
 from sympy import product  # noqa: F401 pylint: disable=unused-import
@@ -99,9 +100,25 @@ def create_products():
 # L I S T   A L L   P R O D U C T S
 ######################################################################
 
-#
-# PLACE YOUR CODE TO LIST ALL PRODUCTS HERE
-#
+@app.route("/products", method=["GET"])
+def list_products():
+    """Returns a list of products"""
+    app.logger.info("Request to list Products...")
+    name = request.args.get("name")
+    products = []
+    if name:
+        app.logger.info("Find by name: %s", name)
+        products = Product.find_by_name(name)
+    else:
+        app.logger.info("Find all")
+        # use the Product.all() method to retrieve all products
+        products = Product.all()
+    # create a list of serialize() products
+    list_of_products = [product.serialize() for product in products]
+    # log the number of products being returned in the list
+    app.logger.info(f"Total list len {len(list_of_products)}")
+    # return the list with a return code of status.HTTP_200_OK
+    return jsonify(list_products), status.HTTP_200_OK
 
 ######################################################################
 # R E A D   A   P R O D U C T
@@ -123,15 +140,40 @@ def get_products(product_id):
 # U P D A T E   A   P R O D U C T
 ######################################################################
 
-#
-# PLACE YOUR CODE TO UPDATE A PRODUCT HERE
-#
+@app.route("/products/<int:product_id>", methods=["PUT"])
+def update_product(product_id):
+    """Updates a product"""
+    app.logger.info(f"Request to Update a product with id [{product_id}]")
+    check_content_type("application/json")
+    # use the Product.find() method to retrieve the product by the product_id
+    product = Product.find(product_id)
+    # abort() with a status.HTTP_404_NOT_FOUND if it cannot be found
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND, f"Product with id [{product_id}] not found")
+    # call the deserialize() method on the product passing in request.get_json()
+    product.deserialize(request.get_json())
+    # call product.update() to update the product with the new data
+    product.update()
+    # return the serialize() version of the product with a return code of status.HTTP_200_OK
+    return jsonify(product.serialize()), status.HTTP_200_OK
+
 
 ######################################################################
 # D E L E T E   A   P R O D U C T
 ######################################################################
 
-
-#
-# PLACE YOUR CODE TO DELETE A PRODUCT HERE
-#
+@app.route("/products/<int:product_id>", methods=["DELETE"])
+def delete_products(product_id):
+    """
+    Delete a Product
+    This endpoint will delete a Product based the id specified in the path
+    """
+    app.logger.info("Request to Delete a product with id [%s]", product_id)
+    # use the Product.find() method to retrieve the product by the product_id
+    product = Product.find(product_id)
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND, f"Could not find [{product_id}]")
+    # if found, call the delete() method on the product
+    product.delete()
+    # return and empty body ("") with a return code of status.HTTP_204_NO_CONTENT
+    return jsonify(""), status.HTTP_204_NO_CONTENT

@@ -24,6 +24,7 @@ Test cases can be run with the following:
   While debugging just these tests it's convenient to use this:
     nosetests --stop tests/test_service.py:TestProductService
 """
+
 import os
 import logging
 from decimal import Decimal
@@ -86,7 +87,9 @@ class TestProductRoutes(TestCase):
             test_product = ProductFactory()
             response = self.client.post(BASE_URL, json=test_product.serialize())
             self.assertEqual(
-                response.status_code, status.HTTP_201_CREATED, "Could not create test product"
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test product",
             )
             new_product = response.get_json()
             test_product.id = new_product["id"]
@@ -107,7 +110,7 @@ class TestProductRoutes(TestCase):
         response = self.client.get("/health")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertEqual(data['message'], 'OK')
+        self.assertEqual(data["message"], "OK")
 
     # ----------------------------------------------------------
     # TEST CREATE
@@ -188,10 +191,7 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response_prev.status_code, status.HTTP_201_CREATED)
         data_prev = response_prev.get_json()
         data_prev["name"] = "Updated Product"
-        self.client.put(
-            f"{BASE_URL}/{product.id}",
-            json=data_prev
-        )
+        self.client.put(f"{BASE_URL}/{product.id}", json=data_prev)
         response = self.client.get(f"{BASE_URL}/{product.id}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
@@ -199,7 +199,7 @@ class TestProductRoutes(TestCase):
 
     def test_delete_product(self):
         """It should delete a single product"""
-        # create a list products containing 5 products using the _create_products() method. 
+        # create a list products containing 5 products using the _create_products() method.
         products = self._create_products(5)
         # call the self.get_product_count() method to retrieve the initial count of products before any deletion
         self.assertEqual(self.get_product_count(), 5)
@@ -268,12 +268,12 @@ class TestProductRoutes(TestCase):
     def test_query_by_availibility(self):
         """It shoudl query the db by availibility"""
         products = self._create_products(10)
-        available_products = [product for product in products if product.available is True]
-        response = self.client.get(
-            BASE_URL, query_string=f"available=true"
-        )
+        available_products = [
+            product for product in products if product.available is True
+        ]
+        response = self.client.get(BASE_URL, query_string=f"available=true")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data=response.get_json()
+        data = response.get_json()
         self.assertEqual(len(data), len(available_products))
         for product in data:
             self.assertEqual(product["available"], True)

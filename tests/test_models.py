@@ -23,6 +23,7 @@ While debugging just these tests it's convenient to use this:
     nosetests --stop tests/test_models.py:TestProductModel
 
 """
+
 import os
 import logging
 import unittest
@@ -74,7 +75,13 @@ class TestProductModel(unittest.TestCase):
 
     def test_create_a_product(self):
         """It should Create a product and assert that it exists"""
-        product = Product(name="Fedora", description="A red hat", price=12.50, available=True, category=Category.CLOTHS)
+        product = Product(
+            name="Fedora",
+            description="A red hat",
+            price=12.50,
+            available=True,
+            category=Category.CLOTHS,
+        )
         self.assertEqual(str(product), "<Product Fedora id=[None]>")
         self.assertTrue(product is not None)
         self.assertEqual(product.id, None)
@@ -157,10 +164,10 @@ class TestProductModel(unittest.TestCase):
     def test_list_all_products(self):
         """It should List all Products in the database"""
         products = Product.all()
-        # Assert if the products list is empty, indicating that there are no products 
+        # Assert if the products list is empty, indicating that there are no products
         # in the database at the beginning of the test case.
         self.assertEqual(len(products), 0)
-        # Use for loop to create five Product objects using a ProductFactory() and call the create() 
+        # Use for loop to create five Product objects using a ProductFactory() and call the create()
         # method on each product to save them to the database.
         for _ in range(5):
             product = ProductFactory()
@@ -168,27 +175,27 @@ class TestProductModel(unittest.TestCase):
             product.create()
         # Fetch all products from the database again using product.all()
         products = Product.all()
-        # Assert if the length of the products list is equal to 5, to verify that the five 
+        # Assert if the length of the products list is equal to 5, to verify that the five
         # products created in the previous step have been successfully added to the database.
         self.assertEqual(len(products), 5)
 
     def test_find_by_name(self):
         """It should find a product by name"""
         products = ProductFactory.create_batch(5)
-        # Use a for loop to iterate over the products list and call the create() 
+        # Use a for loop to iterate over the products list and call the create()
         # method on each product to save them to the database.
         for product in products:
             product.create()
         # Retrieve the name of the first product in the products list.
         product_name = products[0].name
-        # Use a list comprehension to filter the products based on their name and then use len() to calculate 
+        # Use a list comprehension to filter the products based on their name and then use len() to calculate
         # the length of the filtered list, and use the variable called count to hold the number of products that match the name.
         count = len([p for p in products if p.name == product_name])
         # Call the find_by_name() method on the Product class to retrieve products from the database that have the specified name.
         found_products = Product.find_by_name(product_name)
         # Assert if the count of the found products matches the expected count.
         self.assertEqual(len(found_products), count)
-        # Use a for loop to iterate over the found products and assert that each product's 
+        # Use a for loop to iterate over the found products and assert that each product's
         # name matches the expected name, to ensure that all the retrieved products have the correct name.
         for product in found_products:
             self.assertEqual(product.name, product_name)
@@ -196,7 +203,7 @@ class TestProductModel(unittest.TestCase):
     def test_find_by_availability(self):
         """It should find product by availability"""
         products = ProductFactory.create_batch(10)
-        # Use a for loop to iterate over the products list and call 
+        # Use a for loop to iterate over the products list and call
         # the create() method on each product to save them to the database.
         for p in products:
             p.create()
@@ -204,11 +211,11 @@ class TestProductModel(unittest.TestCase):
         available_product = products[0]
         available_product.available = True
         available_product.update()
-        # Use a list comprehension to filter the products based on their availability and then use len() to calculate 
-        # the length of the filtered list, and use the variable called count to hold the number of 
+        # Use a list comprehension to filter the products based on their availability and then use len() to calculate
+        # the length of the filtered list, and use the variable called count to hold the number of
         # products that have the specified availability.
         count = len([p for p in products if p.available])
-        # Call the find_by_availability() method on the Product class to retrieve products from the database 
+        # Call the find_by_availability() method on the Product class to retrieve products from the database
         # that have the specified availability.
         found_products = Product.find_by_availability(True)
         # Assert if the count of the found products matches the expected count.
@@ -228,4 +235,3 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(len(found_products), count)
         for p in found_products:
             self.assertEqual(p.category, product_categ)
-            

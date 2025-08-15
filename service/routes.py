@@ -100,6 +100,7 @@ def create_products():
 # L I S T   A L L   P R O D U C T S
 ######################################################################
 
+
 @app.route("/products", method=["GET"])
 def list_products():
     """Returns a list of products"""
@@ -129,9 +130,11 @@ def list_products():
     # return the list with a return code of status.HTTP_200_OK
     return jsonify(list_products), status.HTTP_200_OK
 
+
 ######################################################################
 # R E A D   A   P R O D U C T
 ######################################################################
+
 
 @app.route("/products/<int:product_id>", methods=["GET"])
 def get_products(product_id):
@@ -145,9 +148,11 @@ def get_products(product_id):
     # return the serialize() version of the product with a return code of status.HTTP_200_OK
     return jsonify(product), status.HTTP_200_OK
 
+
 ######################################################################
 # U P D A T E   A   P R O D U C T
 ######################################################################
+
 
 @app.route("/products/<int:product_id>", methods=["PUT"])
 def update_product(product_id):
@@ -170,6 +175,7 @@ def update_product(product_id):
 ######################################################################
 # D E L E T E   A   P R O D U C T
 ######################################################################
+
 
 @app.route("/products/<int:product_id>", methods=["DELETE"])
 def delete_products(product_id):
